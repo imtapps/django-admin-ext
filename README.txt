@@ -1,1 +1,1 @@
-Define user generated validation requirements for django models.
+Extensions to Django's admin site to add an ajax view.

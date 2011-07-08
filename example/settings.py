@@ -34,5 +34,5 @@ INSTALLED_APPS = (
     'django.contrib.admin',
 
     'sample',
-    'new_app',
+    'djadmin_ext',
 )

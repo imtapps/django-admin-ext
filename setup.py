@@ -4,17 +4,20 @@ REQUIREMENTS = [
     'django',
 ]
 
+TEST_REQUIREMENTS = [
+    'selenium>=2.0'
+] + REQUIREMENTS
+
 setup(
-    name="new_app",
+    name="django-admin-ext",
     version='0.0.1',
-    author="Author Name",
-    author_email="author_email",
-    description="Description for new_app.",
+    author="Aaron Madison and Matthew J Morrison",
+    description="Extensions to Django's admin site to add an ajax view.",
     long_description=open('README.txt', 'r').read(),
-    url="http://www.example.com",
-    packages=("new_app",),
+    url="https://github.com/imtapps/django-admin-ext",
+    packages=("djadmin_ext",),
     install_requires=REQUIREMENTS,
-    tests_require=REQUIREMENTS,
+    tests_require=TEST_REQUIREMENTS,
     test_suite='runtests.runtests',
     zip_safe=False,
     classifiers = [
