@@ -2,7 +2,16 @@
 from django import forms
 from django.core.exceptions import ImproperlyConfigured
 
+__all__ = (
+    'BaseAjaxModelForm',
+)
+
 class BaseAjaxModelForm(forms.ModelForm):
+    """
+    ajax_change_field: must be set to the name of the field on
+    your model that triggers the ajax call when it is changed.
+    """
+
     ajax_change_field = None
 
     def __init__(self, *args, **kwargs):
