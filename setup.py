@@ -10,12 +10,13 @@ TEST_REQUIREMENTS = [
 
 setup(
     name="django-admin-ext",
-    version='0.1.0',
+    version='0.1.1',
     author="Aaron Madison and Matthew J Morrison",
     description="Extensions to Django's admin site to add an ajax view.",
     long_description=open('README.txt', 'r').read(),
     url="https://github.com/imtapps/django-admin-ext",
     packages=("djadmin_ext",),
+    include_package_data=True,
     install_requires=REQUIREMENTS,
     tests_require=TEST_REQUIREMENTS,
     test_suite='runtests.runtests',

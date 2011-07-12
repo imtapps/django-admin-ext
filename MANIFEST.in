@@ -1,0 +1,5 @@
+include LICENSE
+include MANIFEST.in
+
+recursive-include djadmin_ext/static *
+recursive-include djadmin_ext/templates *
