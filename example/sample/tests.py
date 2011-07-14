@@ -1,19 +1,41 @@
 
+import os
+import shlex
+import subprocess
+import sys
+import time
+
 from django.utils import unittest
+
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException
 
 class SeleniumTestCase(unittest.TestCase):
+    test_fixtures = None
+
+    scheme = "http"
+    host = "localhost"
+    port = "8000"
+
+    @classmethod
+    def base_url(cls):
+        url = "%s://%s" % (cls.scheme, cls.host)
+        if cls.port:
+            url += ":%s" % cls.port
+        return unicode(url)
 
     @classmethod
     def setUpClass(cls):
+        cls.start_test_server()
+
         cls.browser = webdriver.Firefox()
         cls.browser.implicitly_wait(1) # browser will wait up to 1 second before failing because element is not found
-        cls.browser.get("http://localhost:8000/admin")
+        cls.browser.get("%s/admin" % cls.base_url())
 
     @classmethod
     def tearDownClass(cls):
         cls.browser.close()
+        cls.p.terminate()
 
     @classmethod
     def login(cls):
@@ -23,6 +45,25 @@ class SeleniumTestCase(unittest.TestCase):
         pswd.send_keys("test")
         submit_button = cls.browser.find_element_by_css_selector(".submit-row>[type='submit']")
         submit_button.click()
+
+    @classmethod
+    def start_test_server(cls):
+        # try to find the settings file and assume manage.py is in the
+        # same directory.
+        settings_module = os.environ['DJANGO_SETTINGS_MODULE']
+        root_dir = os.path.abspath(os.path.join(os.path.dirname(sys.modules.get(settings_module).__file__)))
+
+        fixtures = ''
+        if cls.test_fixtures:
+            fixtures = ' '.join(f for f in cls.test_fixtures)
+        cmd = "%s/manage.py testserver %s" % (root_dir, fixtures)
+        cls.p = subprocess.Popen(shlex.split(cmd))
+
+        time.sleep(3) # wait for the test server to start...
+
+    @classmethod
+    def terminate_test_server(cls):
+        cls.p.terminate()
 
 class AjaxAdminTests(SeleniumTestCase):
     
@@ -124,4 +165,3 @@ class AjaxAdminTests(SeleniumTestCase):
 
         error_item = self.browser.find_element_by_css_selector(".errors.main_ingredient li")
         self.assertEqual("This field is required.", error_item.text)
-        

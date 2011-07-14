@@ -60,13 +60,10 @@ BaseAjaxModelForm:
     it possible.
 
 Testing:
-To test the admin, we wrote selenium tests. To function properly
-you'll need to have django's test server running before kicking
-off the test suite. The tests will open a new firefox browser,
-execute the tests, then close the browser.
-
-# in a separate terminal window
-./manage.py testserver
+To test the admin, we wrote selenium tests. The tests will try
+to start django's test server, open a firefox browser window,
+execute the tests and verify the actions on the page behave as
+expected.
 
 python setup.py test
 

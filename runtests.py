@@ -1,6 +1,10 @@
 #!/usr/bin/env python
+import os
 import sys
 from optparse import OptionParser
+
+os.environ['DJANGO_SETTINGS_MODULE'] = 'example.settings'
+
 from django.conf import settings
 
 if not settings.configured:
