@@ -10,7 +10,7 @@ TEST_REQUIREMENTS = [
 
 setup(
     name="django-admin-ext",
-    version='0.1.1',
+    version='0.1.2',
     author="Aaron Madison and Matthew J Morrison",
     description="Extensions to Django's admin site to add an ajax view.",
     long_description=open('README.txt', 'r').read(),
