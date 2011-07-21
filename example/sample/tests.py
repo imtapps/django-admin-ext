@@ -166,3 +166,6 @@ class AjaxAdminTests(SeleniumTestCase):
 
         error_item = self.browser.find_element_by_css_selector(".errors.main_ingredient li")
         self.assertEqual("This field is required.", error_item.text)
+
+    def test_fail(self):
+        self.fail('ERROR!!!')
