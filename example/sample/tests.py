@@ -28,7 +28,8 @@ class SeleniumTestCase(unittest.TestCase):
     def setUpClass(cls):
         cls.start_test_server()
 
-        cls.browser = webdriver.Firefox()
+        profile = webdriver.FirefoxProfile()
+        cls.browser = webdriver.Firefox(firefox_profile=profile)
         cls.browser.implicitly_wait(1) # browser will wait up to 1 second before failing because element is not found
         cls.browser.get("%s/admin" % cls.base_url())
 
