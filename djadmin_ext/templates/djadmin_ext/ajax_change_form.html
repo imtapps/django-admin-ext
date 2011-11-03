@@ -2,7 +2,7 @@
 
 {% block extrahead %}{{ block.super }}
 <script type="text/javascript">
-    AdminAjax("../ajax/", "{{ opts.module_name }}_form", "{{ adminform.form.change_field_id }}");
+    var djadminAjax = AdminAjax("../ajax/", "{{ opts.module_name }}_form", {{ adminform.form.change_field_ids|safe }});
 </script>
 {% endblock %}
 

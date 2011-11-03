@@ -6,10 +6,16 @@ var AdminAjax = function($){
         self.change_field_id = change_field_id;
 
         $(document).ready(function(){
-            $('#' + self.change_field_id).live('change', function(){
-                self.getForm();
-            });
+            self.setEvents(self.change_field_id);
         });
+
+        self.setEvents = function(fields){
+            $(fields).each(function(){
+                $('#' + this).change(function(){
+                    self.getForm();
+                });
+            });
+        };
 
         self.getForm = function() {
             if (!self.url){
@@ -30,5 +36,7 @@ var AdminAjax = function($){
                 }
             });
         };
+
+        return self;
     };
 }(django.jQuery);

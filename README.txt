@@ -33,7 +33,8 @@ BaseAjaxModelAdmin:
 
 BaseAjaxModelForm:
   - set the ajax_change_field to be the name of the form field whose
-    change triggers the ajax call.
+    change triggers the ajax call OR set the ajax_change_fields to a
+    list of field names whose change triggers the ajax call
 
   - in your form, set the dynamic_fields property to return a dictionary
     whose keys are the field names and values are the instantiated fields.

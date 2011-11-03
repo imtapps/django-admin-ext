@@ -1,24 +1,40 @@
 
 from django.contrib import admin
-from django import forms
 
 from djadmin_ext.helpers import BaseAjaxModelAdmin
 from djadmin_ext.admin_forms import BaseAjaxModelForm
 from sample import models
 
 class MealAdminForm(BaseAjaxModelForm):
-    ajax_change_field = "food_type"
+    ajax_change_fields = ["food_type", "main_ingredient"]
 
     @property
     def dynamic_fields(self):
-        food_type = models.FoodType.objects.get(pk=self.data.get('food_type') or self.initial.get('food_type'))
-        initial_selected = self.data.get('main_ingredient') or (self.instance.pk and self.instance.main_ingredient)
+        selected_food_type = self.data.get('food_type') or self.initial.get('food_type')
+        if not selected_food_type:
+            return {}
 
-        return {
-            'main_ingredient':forms.ModelChoiceField(
-                queryset=models.Ingredient.objects.filter(food_type=food_type),
-                initial=initial_selected)
-        }
+        food_type = models.FoodType.objects.get(pk=selected_food_type)
+
+        selected_ingredient = self.get_selected_value('main_ingredient')
+
+        if selected_ingredient:
+            selected_ingredient = int(selected_ingredient)
+
+        fields = {}
+
+        ingredients = models.Ingredient.objects.filter(food_type=food_type)
+        fields['main_ingredient'] = self.create_field_and_assign_initial_value(ingredients, selected_ingredient)
+
+        if fields['main_ingredient'].initial:
+            details = models.IngredientDetails.objects.filter(ingredient=selected_ingredient)
+
+            if selected_ingredient and details:
+                selected_ingredient_details = self.get_selected_value('ingredient_details')
+                fields['ingredient_details'] = self.create_field_and_assign_initial_value(details,
+                                                                                          selected_ingredient_details)
+
+        return fields
 
     class Meta(object):
         fields = ['food_type']
@@ -29,4 +45,5 @@ class MealAdmin(BaseAjaxModelAdmin):
 
 admin.site.register(models.FoodType)
 admin.site.register(models.Ingredient)
+admin.site.register(models.IngredientDetails)
 admin.site.register(models.Meal, MealAdmin)

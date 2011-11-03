@@ -27,14 +27,27 @@ TEMPLATE_DIRS = (
     abspath(join(parent, 'templates')),
 )
 
+PROJECT_APPS = ('djadmin_ext', 'sample')
+
 INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.staticfiles',
+) + PROJECT_APPS
 
+try:
+    import django_jenkins
 
-    'sample',
-    'djadmin_ext',
-)
+    INSTALLED_APPS = INSTALLED_APPS + ('django_jenkins',)
+    JENKINS_TASKS = (
+        'django_jenkins.tasks.django_tests',
+        'django_jenkins.tasks.run_pylint',
+        'django_jenkins.tasks.run_pep8',
+        'django_jenkins.tasks.run_pyflakes',
+        'django_jenkins.tasks.with_coverage',
+    )
+
+except ImportError:
+    pass

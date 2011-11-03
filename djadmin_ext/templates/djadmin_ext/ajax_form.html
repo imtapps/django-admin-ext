@@ -1,3 +1,7 @@
 {% for fieldset in adminform %}
   {% include "admin/includes/fieldset.html" %}
 {% endfor %}
+
+<script type="text/javascript">
+    djadminAjax.setEvents({{ adminform.form.change_field_ids|safe }});
+</script>

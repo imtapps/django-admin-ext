@@ -22,6 +22,7 @@
     {"pk": 2,
         "model": "sample.foodtype",
         "fields": {"name": "Pizza"}},
+
     {"pk": 1,
         "model": "sample.ingredient",
         "fields": {"food_type": [2], "name": "pepperoni"}},
@@ -40,5 +41,20 @@
 
     {"pk": 1,
         "model": "sample.meal",
-        "fields": {"food_type": 2, "main_ingredient": 4}}
+        "fields": {"food_type": 2, "main_ingredient": 4}},
+
+    {"pk": 1,
+        "model": "sample.ingredientdetails",
+        "fields": {"ingredient":3, "name":"Grass Fed"}},
+    {"pk": 2,
+        "model": "sample.ingredientdetails",
+        "fields": {"ingredient":3, "name":"Cardboard Fed"}},
+    {"pk": 3,
+        "model": "sample.ingredientdetails",
+        "fields": {"ingredient":1, "name":"Grass Fed Goodness"}},
+    {"pk": 4,
+        "model": "sample.ingredientdetails",
+        "fields": {"ingredient":1, "name":"Cardboard Not So Goodness"}}
+
+
 ]

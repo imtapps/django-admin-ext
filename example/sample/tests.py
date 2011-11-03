@@ -1,4 +1,4 @@
-
+from time import time
 import os
 import shlex
 import subprocess
@@ -73,6 +73,21 @@ class AjaxAdminTests(SeleniumTestCase):
         super(AjaxAdminTests, cls).setUpClass()
         cls.login()
 
+    def assert_selected_option(self, element_id, value):
+        option = self.browser.find_element_by_css_selector('#' + element_id + ' option[selected="selected"]')
+        self.assertEqual(value, option.text)
+
+    def assert_select_has_options(self, element_id, expected_ingredients):
+        details = self.browser.find_element_by_css_selector('#' + element_id)
+        options = details.find_elements_by_tag_name('option')
+        self.assertItemsEqual(expected_ingredients, [o.text for o in options])
+
+    def change_value_for_element(self, element_id, value):
+        element = self.browser.find_element_by_css_selector('#' + element_id)
+        element.send_keys(value)
+        # click off of the element to trigger the change event
+        self.browser.find_element_by_css_selector('label[for="' + element_id + '"]').click()
+
     def test_django_test_server_is_running(self):
         """
         Before running these tests, in a separate terminal window run
@@ -95,49 +110,80 @@ class AjaxAdminTests(SeleniumTestCase):
 
     def test_main_ingredient_element_shows_when_pizza_food_type_is_selected(self):
         self.browser.get("http://localhost:8000/admin/sample/meal/add/")
-        food_type = self.browser.find_element_by_css_selector('#id_food_type')
-        food_type.send_keys('pizza')
+        self.change_value_for_element('id_food_type', 'pizza')
 
-        # click off of the food_type drop down to trigger the change event
-        self.browser.find_element_by_css_selector('label[for="id_food_type"]').click()
-
-        main_ingredient = self.browser.find_element_by_css_selector('#id_main_ingredient')
-        options = main_ingredient.find_elements_by_tag_name('option')
-
-        expected_ingredients = [u'---------', u'pepperoni', u'mushrooms', u'beef', u'anchovies']
-        self.assertItemsEqual(expected_ingredients, [o.text for o in options])
+        self.assert_select_has_options('id_main_ingredient', [u'---------', u'pepperoni', u'mushrooms', u'beef', u'anchovies'])
 
     def test_main_ingredient_element_shows_when_burger_food_type_is_selected(self):
         self.browser.get("http://localhost:8000/admin/sample/meal/add/")
-        food_type = self.browser.find_element_by_css_selector('#id_food_type')
-        food_type.send_keys('burger')
+        self.change_value_for_element('id_food_type', 'burger')
 
-        # click off of the food_type drop down to trigger the change event
-        self.browser.find_element_by_css_selector('label[for="id_food_type"]').click()
+        self.assert_select_has_options('id_main_ingredient', [u'---------', u'mushrooms', u'beef', u'lettuce'])
 
-        main_ingredient = self.browser.find_element_by_css_selector('#id_main_ingredient')
-        options = main_ingredient.find_elements_by_tag_name('option')
+    def test_ingredient_details_is_shown_when_beef_is_selected(self):
+        self.browser.get("http://localhost:8000/admin/sample/meal/add/")
+        self.change_value_for_element('id_food_type', 'burger')
+        self.change_value_for_element('id_main_ingredient', 'beef')
 
-        expected_ingredients = [u'---------', u'mushrooms', u'beef', u'lettuce']
-        self.assertItemsEqual(expected_ingredients, [o.text for o in options])
+        self.assert_select_has_options('id_ingredient_details', [u'---------', u'Grass Fed', u'Cardboard Fed'])
+
+    def test_ingredient_details_is_reset_when_main_ingredient_changes(self):
+        self.browser.get("http://localhost:8000/admin/sample/meal/add/")
+        self.change_value_for_element('id_food_type', 'burger')
+        self.change_value_for_element('id_main_ingredient', 'beef')
+
+        details = self.browser.find_element_by_css_selector('#id_ingredient_details')
+        self.assertTrue(details.is_displayed())
+
+        self.change_value_for_element('id_main_ingredient', 'lettuce')
+
+        with self.assertRaises(NoSuchElementException):
+            self.browser.find_element_by_css_selector('#id_ingredient_details')
+
+    def test_ingredient_details_change_when_main_ingredient_changes(self):
+        self.browser.get("http://localhost:8000/admin/sample/meal/add/")
+        self.change_value_for_element('id_food_type', 'pizza')
+        self.change_value_for_element('id_main_ingredient', 'beef')
+
+        self.assert_select_has_options('id_ingredient_details', [u'---------', u'Grass Fed', u'Cardboard Fed'])
+
+        self.change_value_for_element('id_main_ingredient', 'pepperoni')
+
+        self.assert_select_has_options('id_ingredient_details', [u'---------', u'Grass Fed Goodness', u'Cardboard Not So Goodness'])
+
+    def test_main_ingredient_does_not_change_when_food_type_changes_if_valid_option(self):
+        self.browser.get("http://localhost:8000/admin/sample/meal/add/")
+        self.change_value_for_element('id_food_type', 'pizza')
+        self.change_value_for_element('id_main_ingredient', 'beef')
+
+        self.assert_selected_option('id_main_ingredient', 'beef')
+
+        self.change_value_for_element('id_food_type', 'burger')
+        self.assert_selected_option('id_main_ingredient', 'beef')
 
     def test_shows_dynamic_field_on_existing_instance(self):
         self.browser.get("http://localhost:8000/admin/sample/meal/1/")
-        option = self.browser.find_element_by_css_selector('#id_main_ingredient option[selected="selected"]')
-        self.assertEqual('anchovies', option.text)
+        self.assert_selected_option('id_main_ingredient', 'anchovies')
+
+    def test_sets_ingredient_details_when_available(self):
+        self.browser.get("http://localhost:8000/admin/sample/meal/add/")
+
+        self.change_value_for_element('id_food_type', 'burger')
+        self.change_value_for_element('id_main_ingredient', 'beef')
+        self.change_value_for_element('id_ingredient_details', 'Grass Fed')
+
+        self.browser.find_element_by_name('_continue').click()
+
+        self.assert_selected_option('id_ingredient_details', 'Grass Fed')
 
     def test_allows_changing_dynamic_field_on_existing_instance(self):
         self.browser.get("http://localhost:8000/admin/sample/meal/add/")
 
-        food_type = self.browser.find_element_by_css_selector('#id_food_type')
-        food_type.send_keys('burger')
-
-        # click off of the food_type drop down to trigger the change event
-        self.browser.find_element_by_css_selector('label[for="id_food_type"]').click()
+        self.change_value_for_element('id_food_type', 'burger')
 
         # create new meal
         main_ingredient = self.browser.find_element_by_css_selector('#id_main_ingredient')
-        main_ingredient.send_keys('beef')
+        main_ingredient.send_keys('mushrooms')
         self.browser.find_element_by_name('_continue').click()
 
         # change main_ingredient for new meal
@@ -150,8 +196,7 @@ class AjaxAdminTests(SeleniumTestCase):
             self.browser.find_element_by_css_selector(".errors")
 
         # make sure our new main_ingredient was saved
-        option = self.browser.find_element_by_css_selector('#id_main_ingredient option[selected="selected"]')
-        self.assertEqual('lettuce', option.text)
+        self.assert_selected_option('id_main_ingredient', 'lettuce')
 
         #delete our meal when we're done
         self.browser.find_element_by_css_selector('.deletelink').click()
