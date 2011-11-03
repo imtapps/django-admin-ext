@@ -21,7 +21,7 @@ class BaseAjaxModelForm(forms.ModelForm):
             self.ajax_change_fields = [self.ajax_change_field]
         self.setup_dynamic_fields()
 
-    def get_value_from_initial_or_get(self, field):
+    def get_value_from_data_or_initial(self, field):
         return self.data.get(field) or self.initial.get(field)
 
     def setup_dynamic_fields(self):
@@ -59,8 +59,9 @@ class BaseAjaxModelForm(forms.ModelForm):
         return super(BaseAjaxModelForm, self).save(*args, **kwargs)
 
     def get_selected_value(self, field_name):
-        return self.get_value_from_initial_or_get(field_name) or (
-        self.instance.pk and getattr(self.instance, field_name).pk)
+        current_value = self.get_value_from_data_or_initial(field_name)
+        selected_value = current_value or (self.instance.pk and getattr(self.instance, field_name).pk)
+        return selected_value
 
     def create_field_and_assign_initial_value(self, queryset, selected_value):
         field = forms.ModelChoiceField(queryset=queryset)
