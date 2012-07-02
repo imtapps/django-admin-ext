@@ -12,6 +12,8 @@ REQUIREMENTS = [
 TEST_REQUIREMENTS = [
     'selenium>=2.0',
     'django-jenkins',
+    'pylint',
+    'coverage',
     'pep8',
     'pyflakes',
 ]
