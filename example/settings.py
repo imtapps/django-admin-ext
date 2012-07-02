@@ -14,7 +14,10 @@ TEMPLATE_DEBUG = DEBUG
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': 'example.db',
+        'NAME': abspath(join(parent, 'example.db')),
+        'OPTIONS': {
+            'check_same_thread': False,
+        }
     }
 }
 

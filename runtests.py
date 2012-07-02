@@ -13,7 +13,7 @@ if not settings.configured:
     settings.configure(**example_settings.__dict__)
 
 #This import must come after settings config
-from django.test.simple import run_tests
+from django.test.simple import DjangoTestSuiteRunner
 
 def runtests(*test_args, **kwargs):
     if 'south' in settings.INSTALLED_APPS:
@@ -23,7 +23,8 @@ def runtests(*test_args, **kwargs):
     if not test_args:
         test_args = ['sample']
 
-    failures = run_tests(test_args, verbosity=kwargs.get('verbosity', 0), interactive=kwargs.get('interactive', False), failfast=kwargs.get('failfast'))
+    runner = DjangoTestSuiteRunner(verbosity=kwargs.get('verbosity', 0), interactive=kwargs.get('interactive', False), failfast=kwargs.get('failfast'))
+    failures = runner.run_tests(test_args)
     sys.exit(failures)
 
 if __name__ == '__main__':
