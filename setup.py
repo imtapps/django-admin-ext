@@ -12,10 +12,11 @@ REQUIREMENTS = [
 TEST_REQUIREMENTS = [
     'selenium>=2.0',
     'django-jenkins',
-    'pylint',
     'coverage',
     'pep8',
     'pyflakes',
+    'django-nose',
+    'nosexcover',
 ]
 
 def do_setup():
@@ -29,8 +30,6 @@ def do_setup():
         packages=("djadmin_ext",),
         include_package_data=True,
         install_requires=REQUIREMENTS,
-        tests_require=TEST_REQUIREMENTS,
-        test_suite='runtests.runtests',
         zip_safe=False,
         classifiers = [
             "Development Status :: 3 - Alpha",

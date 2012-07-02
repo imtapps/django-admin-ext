@@ -1,37 +1,32 @@
 from django.test.testcases import LiveServerTestCase
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.firefox.webdriver import WebDriver
+import time
 
-class SeleniumTestCase(LiveServerTestCase):
-    test_fixtures = None
-
-    scheme = "http"
-    host = "localhost"
-    port = "8081"
+class AjaxAdminTests(LiveServerTestCase):
 
     @classmethod
     def setUpClass(cls):
+        super(AjaxAdminTests, cls).setUpClass()
         cls.browser = WebDriver()
-        super(SeleniumTestCase, cls).setUpClass()
 
     @classmethod
     def tearDownClass(cls):
-        super(SeleniumTestCase, cls).tearDownClass()
+        super(AjaxAdminTests, cls).tearDownClass()
         cls.browser.quit()
-
-class AjaxAdminTests(SeleniumTestCase):
 
     def setUp(self):
         self.login()
 
     def login(self):
-        self.browser.get("%s/admin" % self.live_server_url)
+        self.browser.get("%s/admin/" % self.live_server_url)
         user = self.browser.find_element_by_css_selector('#id_username')
         user.send_keys("admin")
         pswd = self.browser.find_element_by_css_selector('#id_password')
         pswd.send_keys("test")
         submit_button = self.browser.find_element_by_css_selector(".submit-row>[type='submit']")
         submit_button.click()
+        time.sleep(1)
 
     def assert_selected_option(self, element_id, value):
         option = self.browser.find_element_by_css_selector('#' + element_id + ' option[selected="selected"]')
