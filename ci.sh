@@ -23,7 +23,7 @@ PEP8_EXIT=$?
 pyflakes djadmin_ext > jenkins_reports/pyflakes.report
 PYFLAKES_EXIT=$?
 let JENKINS_EXIT="$TEST_EXIT + $PEP8_EXIT + $PYFLAKES_EXIT"
-if [ $JENKINS_EXIT -gt 0 ]; then
+if [ $JENKINS_EXIT -gt 2 ]; then
     echo "Test exit status:" $TEST_EXIT
     echo "PEP8 exit status:" $PEP8_EXIT
     echo "Pyflakes exit status:" $PYFLAKES_EXIT
