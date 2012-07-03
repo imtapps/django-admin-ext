@@ -1,9 +1,10 @@
-from django.test.testcases import LiveServerTestCase
+from django.contrib.auth.models import User
+from django.test.testcases import TestCase, LiveServerTestCase
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.firefox.webdriver import WebDriver
 import time
 
-class AjaxAdminTests(LiveServerTestCase):
+class AjaxAdminTests(TestCase, LiveServerTestCase):
 
     @classmethod
     def setUpClass(cls):
@@ -16,6 +17,7 @@ class AjaxAdminTests(LiveServerTestCase):
         cls.browser.quit()
 
     def setUp(self):
+        list(User.objects.all())
         self.login()
 
     def login(self):
@@ -42,6 +44,7 @@ class AjaxAdminTests(LiveServerTestCase):
         element.send_keys(value)
         # click off of the element to trigger the change event
         self.browser.find_element_by_css_selector('label[for="' + element_id + '"]').click()
+        time.sleep(1)
 
     def test_main_ingredient_element_not_present_initially(self):
         self.browser.get("%s/admin/sample/meal/add/" % self.live_server_url)
