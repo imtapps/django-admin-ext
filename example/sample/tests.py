@@ -28,7 +28,7 @@ class AjaxAdminTests(TestCase, LiveServerTestCase):
         pswd.send_keys("test")
         submit_button = self.browser.find_element_by_css_selector(".submit-row>[type='submit']")
         submit_button.click()
-        time.sleep(1)
+        time.sleep(2)
 
     def assert_selected_option(self, element_id, value):
         option = self.browser.find_element_by_css_selector('#' + element_id + ' option[selected="selected"]')
