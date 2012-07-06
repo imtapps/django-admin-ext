@@ -44,7 +44,7 @@ class AjaxAdminTests(TestCase, LiveServerTestCase):
         element.send_keys(value)
         # click off of the element to trigger the change event
         self.browser.find_element_by_css_selector('label[for="' + element_id + '"]').click()
-        time.sleep(1)
+        time.sleep(2)
 
     def test_main_ingredient_element_not_present_initially(self):
         self.browser.get("%s/admin/sample/meal/add/" % self.live_server_url)
