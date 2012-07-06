@@ -26,8 +26,15 @@ class AjaxAdminTests(TestCase, LiveServerTestCase):
         user.send_keys("admin")
         pswd = self.browser.find_element_by_css_selector('#id_password')
         pswd.send_keys("test")
-        submit_button = self.browser.find_element_by_css_selector(".submit-row>[type='submit']")
-        submit_button.click()
+        self.click_element(selector=".submit-row>[type='submit']")
+
+    def click_element(self, name=None, selector=None):
+        element = None
+        if name:
+            element = self.browser.find_element_by_name(name)
+        elif selector:
+            element = self.browser.find_element_by_css_selector(selector)
+        element.click()
         time.sleep(2)
 
     def assert_selected_option(self, element_id, value):
@@ -43,8 +50,7 @@ class AjaxAdminTests(TestCase, LiveServerTestCase):
         element = self.browser.find_element_by_css_selector('#' + element_id)
         element.send_keys(value)
         # click off of the element to trigger the change event
-        self.browser.find_element_by_css_selector('label[for="' + element_id + '"]').click()
-        time.sleep(2)
+        self.click_element(selector='label[for="' + element_id + '"]')
 
     def test_main_ingredient_element_not_present_initially(self):
         self.browser.get("%s/admin/sample/meal/add/" % self.live_server_url)
@@ -117,7 +123,7 @@ class AjaxAdminTests(TestCase, LiveServerTestCase):
         self.change_value_for_element('id_main_ingredient', 'beef')
         self.change_value_for_element('id_ingredient_details', 'Grass Fed')
 
-        self.browser.find_element_by_name('_continue').click()
+        self.click_element(name='_continue')
 
         self.assert_selected_option('id_ingredient_details', 'Grass Fed')
 
@@ -129,12 +135,12 @@ class AjaxAdminTests(TestCase, LiveServerTestCase):
         # create new meal
         main_ingredient = self.browser.find_element_by_css_selector('#id_main_ingredient')
         main_ingredient.send_keys('mushrooms')
-        self.browser.find_element_by_name('_continue').click()
+        self.click_element(name='_continue')
 
         # change main_ingredient for new meal
         main_ingredient2 = self.browser.find_element_by_css_selector('#id_main_ingredient')
         main_ingredient2.send_keys('lettuce')
-        self.browser.find_element_by_name('_continue').click()
+        self.click_element(name='_continue')
 
         # make sure there are no errors
         with self.assertRaises(NoSuchElementException):
@@ -144,15 +150,15 @@ class AjaxAdminTests(TestCase, LiveServerTestCase):
         self.assert_selected_option('id_main_ingredient', 'lettuce')
 
         #delete our meal when we're done
-        self.browser.find_element_by_css_selector('.deletelink').click()
-        self.browser.find_element_by_css_selector('[type="submit"]').click()
+        self.click_element(selector='.deletelink')
+        self.click_element(selector='[type="submit"]')
 
     def test_gives_field_required_error_when_dynamic_field_not_chosen(self):
         self.browser.get("%s/admin/sample/meal/add/" % self.live_server_url)
         food_type = self.browser.find_element_by_css_selector('#id_food_type')
         food_type.send_keys('burger')
 
-        self.browser.find_element_by_name('_save').click()
+        self.click_element(name='_save')
 
         error_item = self.browser.find_element_by_css_selector(".errors.field-main_ingredient li")
         self.assertEqual("This field is required.", error_item.text)
