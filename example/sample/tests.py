@@ -9,7 +9,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 def retry(func):
 
     @wraps(func)
-    def retry_test(self, countdown=10, *args, **kwargs):
+    def retry_test(self, countdown=30, *args, **kwargs):
         try:
             result = func(self, *args, **kwargs)
         except Exception:
