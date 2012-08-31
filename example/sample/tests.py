@@ -46,7 +46,16 @@ class AjaxAdminTests(TestCase, LiveServerTestCase):
 
     @classmethod
     def tearDownClass(cls):
-        super(AjaxAdminTests, cls).tearDownClass()
+        # This is a hack because Django only waits for 2 seconds
+        # apparently, that is not long enough for this application
+        if hasattr(cls, 'server_thread'):
+            thread = cls.server_thread
+            if hasattr(thread, 'httpd'):
+                httpd = thread.httpd
+                httpd._StoppableWSGIServer__serving = False
+                if not httpd._StoppableWSGIServer__is_shut_down.wait(30):
+                    raise RuntimeError("Could not stop live server in 10 seconds.")
+                httpd.server_close()
         cls.browser.quit()
 
     def setUp(self):
