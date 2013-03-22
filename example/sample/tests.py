@@ -2,7 +2,7 @@ from functools import wraps
 from django.contrib.auth.models import User
 from django.test.testcases import TestCase, LiveServerTestCase
 from selenium.common.exceptions import TimeoutException, NoSuchElementException, StaleElementReferenceException
-from selenium.webdriver.firefox.webdriver import WebDriver
+from selenium import webdriver
 from selenium.webdriver.support.wait import WebDriverWait
 
 
@@ -42,21 +42,21 @@ class AjaxAdminTests(TestCase, LiveServerTestCase):
     @classmethod
     def setUpClass(cls):
         super(AjaxAdminTests, cls).setUpClass()
-        cls.browser = WebDriver()
+        caps = webdriver.DesiredCapabilities.FIREFOX
+        caps['platform'] = 'Windows 2003'
+        caps['version'] = '19'
+        caps['name'] = 'django-admin-ext'
+
+        cls.driver = webdriver.Remote(
+            desired_capabilities=caps,
+            command_executor="http://imtappswebadmin:841f95a0-c21d-4cb4-a7f4-288ed88a4b18@ondemand.saucelabs.com:80/wd/hub"
+        )
+        cls.driver.implicitly_wait(30)
 
     @classmethod
     def tearDownClass(cls):
-        # This is a hack because Django only waits for 2 seconds
-        # apparently, that is not long enough for this application
-        if hasattr(cls, 'server_thread'):
-            thread = cls.server_thread
-            if hasattr(thread, 'httpd'):
-                httpd = thread.httpd
-                httpd._StoppableWSGIServer__serving = False
-                if not httpd._StoppableWSGIServer__is_shut_down.wait(30):
-                    raise RuntimeError("Could not stop live server in 10 seconds.")
-                httpd.server_close()
-        cls.browser.quit()
+        print "Link to your job: https://saucelabs.com/jobs/%s" % cls.driver.session_id
+        cls.driver.quit()
 
     def setUp(self):
         list(User.objects.all())
@@ -67,7 +67,7 @@ class AjaxAdminTests(TestCase, LiveServerTestCase):
 
     def find_element(self, context=None, name=None, selector=None, tag=None):
         argument = name or selector or tag
-        context = context or self.browser
+        context = context or self.driver
         if name:
             method = 'find_element_by_name'
         elif selector:
@@ -85,7 +85,7 @@ class AjaxAdminTests(TestCase, LiveServerTestCase):
         element.click()
 
     def login(self):
-        self.browser.get("%s/admin/" % self.live_server_url)
+        self.driver.get("%s/admin/" % self.live_server_url)
         user = self.find_element(selector='#id_username')
         user.send_keys("admin")
         pswd = self.find_element(selector='#id_password')
@@ -108,34 +108,33 @@ class AjaxAdminTests(TestCase, LiveServerTestCase):
         self.click_element(selector='label[for="' + element_id + '"]')
 
     def test_main_ingredient_element_not_present_initially(self):
-        self.browser.get("%s/admin/sample/meal/add/" % self.live_server_url)
+        self.driver.get("%s/admin/sample/meal/add/" % self.live_server_url)
 
         self.find_element(selector='#id_food_type')
         with self.assertRaises(TimeoutException):
             self.find_element(selector='#id_main_ingredient')
 
     def test_main_ingredient_element_shows_when_pizza_food_type_is_selected(self):
-        self.browser.get("%s/admin/sample/meal/add/" % self.live_server_url)
+        self.driver.get("%s/admin/sample/meal/add/" % self.live_server_url)
         self.change_value_for_element('id_food_type', 'pizza')
 
         self.assert_select_has_options('id_main_ingredient', [u'---------', u'pepperoni', u'mushrooms', u'beef', u'anchovies'])
 
     def test_main_ingredient_element_shows_when_burger_food_type_is_selected(self):
-
-        self.browser.get("%s/admin/sample/meal/add/" % self.live_server_url)
+        self.driver.get("%s/admin/sample/meal/add/" % self.live_server_url)
         self.change_value_for_element('id_food_type', 'burger')
 
         self.assert_select_has_options('id_main_ingredient', [u'---------', u'mushrooms', u'beef', u'lettuce'])
 
     def test_ingredient_details_is_shown_when_beef_is_selected(self):
-        self.browser.get("%s/admin/sample/meal/add/" % self.live_server_url)
+        self.driver.get("%s/admin/sample/meal/add/" % self.live_server_url)
         self.change_value_for_element('id_food_type', 'burger')
         self.change_value_for_element('id_main_ingredient', 'beef')
 
         self.assert_select_has_options('id_ingredient_details', [u'---------', u'Grass Fed', u'Cardboard Fed'])
 
     def test_ingredient_details_is_reset_when_main_ingredient_changes(self):
-        self.browser.get("%s/admin/sample/meal/add/" % self.live_server_url)
+        self.driver.get("%s/admin/sample/meal/add/" % self.live_server_url)
         self.change_value_for_element('id_food_type', 'burger')
         self.change_value_for_element('id_main_ingredient', 'beef')
 
@@ -152,7 +151,7 @@ class AjaxAdminTests(TestCase, LiveServerTestCase):
             self.fail("Expected not to find #id_ingredient_details")
 
     def test_ingredient_details_change_when_main_ingredient_changes(self):
-        self.browser.get("%s/admin/sample/meal/add/" % self.live_server_url)
+        self.driver.get("%s/admin/sample/meal/add/" % self.live_server_url)
         self.change_value_for_element('id_food_type', 'pizza')
         self.change_value_for_element('id_main_ingredient', 'beef')
 
@@ -163,7 +162,7 @@ class AjaxAdminTests(TestCase, LiveServerTestCase):
         self.assert_select_has_options('id_ingredient_details', [u'---------', u'Grass Fed Goodness', u'Cardboard Not So Goodness'])
 
     def test_main_ingredient_does_not_change_when_food_type_changes_if_valid_option(self):
-        self.browser.get("%s/admin/sample/meal/add/" % self.live_server_url)
+        self.driver.get("%s/admin/sample/meal/add/" % self.live_server_url)
         self.change_value_for_element('id_food_type', 'pizza')
         self.change_value_for_element('id_main_ingredient', 'beef')
 
@@ -173,11 +172,11 @@ class AjaxAdminTests(TestCase, LiveServerTestCase):
         self.assert_selected_option('id_main_ingredient', 'beef')
 
     def test_shows_dynamic_field_on_existing_instance(self):
-        self.browser.get("%s/admin/sample/meal/1/" % self.live_server_url)
+        self.driver.get("%s/admin/sample/meal/1/" % self.live_server_url)
         self.assert_selected_option('id_main_ingredient', 'anchovies')
 
     def test_sets_ingredient_details_when_available(self):
-        self.browser.get("%s/admin/sample/meal/add/" % self.live_server_url)
+        self.driver.get("%s/admin/sample/meal/add/" % self.live_server_url)
 
         self.change_value_for_element('id_food_type', 'burger')
         self.change_value_for_element('id_main_ingredient', 'beef')
@@ -188,7 +187,7 @@ class AjaxAdminTests(TestCase, LiveServerTestCase):
         self.assert_selected_option('id_ingredient_details', 'Grass Fed')
 
     def test_allows_changing_dynamic_field_on_existing_instance(self):
-        self.browser.get("%s/admin/sample/meal/add/" % self.live_server_url)
+        self.driver.get("%s/admin/sample/meal/add/" % self.live_server_url)
 
         self.change_value_for_element('id_food_type', 'burger')
 
@@ -214,7 +213,7 @@ class AjaxAdminTests(TestCase, LiveServerTestCase):
         self.click_element(selector='[type="submit"]')
 
     def test_gives_field_required_error_when_dynamic_field_not_chosen(self):
-        self.browser.get("%s/admin/sample/meal/add/" % self.live_server_url)
+        self.driver.get("%s/admin/sample/meal/add/" % self.live_server_url)
         food_type = self.find_element(selector='#id_food_type')
         food_type.send_keys('burger')
 
