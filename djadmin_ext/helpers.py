@@ -1,9 +1,9 @@
 
-from django.conf.urls.defaults import patterns, url
+from django.conf.urls import patterns, url
 from django.contrib import admin
 from django.contrib.admin import helpers
 from django.shortcuts import render_to_response
-from django.utils.functional import update_wrapper
+from functools import update_wrapper
 
 __all__ = (
     'BaseCustomUrlAdmin', 'BaseAjaxModelAdmin',
@@ -80,7 +80,7 @@ class BaseAjaxModelAdmin(BaseCustomUrlAdmin):
         We set the request parameters to 'initial' data so the ajax
         form doesn't trigger validation. (it would if we used 'data')
         """
-        form_class = self.get_form(request)
+        form_class = self.get_form(request, fields=None)
         return form_class(initial=self.query_dict_to_dict(request.REQUEST), instance=obj)
 
     def query_dict_to_dict(self, query_dict):

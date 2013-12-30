@@ -6,7 +6,7 @@ from distutils.core import Command, setup
 from djadmin_ext import VERSION
 
 REQUIREMENTS = [
-    'django<1.5',
+    'django<1.7',
 ]
 
 TEST_REQUIREMENTS = [
