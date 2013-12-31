@@ -43,8 +43,8 @@ class AjaxAdminTests(TestCase, LiveServerTestCase):
     def setUpClass(cls):
         super(AjaxAdminTests, cls).setUpClass()
         caps = webdriver.DesiredCapabilities.FIREFOX
-        caps['platform'] = 'Windows 2003'
-        caps['version'] = '19'
+        caps['platform'] = 'Windows XP'
+        caps['version'] = '25'
         caps['name'] = 'django-admin-ext'
 
         cls.driver = webdriver.Remote(
