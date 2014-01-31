@@ -26,7 +26,7 @@ class BaseAjaxModelForm(forms.ModelForm):
 
     def setup_dynamic_fields(self):
         for field_name, field in self.dynamic_fields.items():
-            self.fields[field_name] = field
+            self.fields[field_name] = field()
 
     @property
     def dynamic_fields(self):
