@@ -38,10 +38,7 @@ class MealAdminForm(BaseAjaxModelForm):
         return fields
 
     def create_field_and_assign_initial_value(self, queryset, selected_value):
-        field = forms.ModelChoiceField(queryset=queryset)
-        if selected_value in [i.pk for i in queryset]:
-            field.initial = selected_value
-        return lambda: field
+        return lambda: super(MealAdminForm, self).create_field_and_assign_initial_value(queryset, selected_value)
 
     class Meta(object):
         fields = ['food_type']
