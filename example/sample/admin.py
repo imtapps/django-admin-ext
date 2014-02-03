@@ -1,4 +1,5 @@
 
+from django import forms
 from django.contrib import admin
 
 from djadmin_ext.helpers import BaseAjaxModelAdmin
@@ -26,7 +27,7 @@ class MealAdminForm(BaseAjaxModelForm):
         ingredients = models.Ingredient.objects.filter(food_type=food_type)
         fields['main_ingredient'] = self.create_field_and_assign_initial_value(ingredients, selected_ingredient)
 
-        if fields['main_ingredient'].initial:
+        if fields['main_ingredient']().initial:
             details = models.IngredientDetails.objects.filter(ingredient=selected_ingredient)
 
             if selected_ingredient and details:
@@ -35,6 +36,12 @@ class MealAdminForm(BaseAjaxModelForm):
                                                                                           selected_ingredient_details)
 
         return fields
+
+    def create_field_and_assign_initial_value(self, queryset, selected_value):
+        field = forms.ModelChoiceField(queryset=queryset)
+        if selected_value in [i.pk for i in queryset]:
+            field.initial = selected_value
+        return lambda: field
 
     class Meta(object):
         fields = ['food_type']
