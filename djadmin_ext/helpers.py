@@ -1,5 +1,5 @@
 
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 from django.contrib import admin
 from django.contrib.admin import helpers
 from django.shortcuts import render_to_response
@@ -102,7 +102,7 @@ class BaseAjaxModelAdmin(BaseCustomUrlAdmin):
 
     def get_custom_urls(self, wrapper):
         info = self.model._meta.app_label, self.model._meta.module_name
-        return patterns('',
+        return [
             url(r'^ajax/$',
                 wrapper(self.ajax_view), name='%s_%s_ajax' % info),
-        )
+        ]
