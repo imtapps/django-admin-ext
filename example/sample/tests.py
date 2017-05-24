@@ -38,6 +38,7 @@ class Retry(type):
 
 class AjaxAdminTests(TestCase, LiveServerTestCase):
     __metaclass__ = Retry
+    fixtures = ['initial_data.json']
 
     @classmethod
     def setUpClass(cls):
@@ -55,7 +56,7 @@ class AjaxAdminTests(TestCase, LiveServerTestCase):
 
     @classmethod
     def tearDownClass(cls):
-        print "Link to your job: https://saucelabs.com/jobs/%s" % cls.driver.session_id
+        print("Link to your job: https://saucelabs.com/jobs/%s" % cls.driver.session_id)
         cls.driver.quit()
 
     def setUp(self):
@@ -86,6 +87,9 @@ class AjaxAdminTests(TestCase, LiveServerTestCase):
 
     def login(self):
         self.driver.get("%s/admin/" % self.live_server_url)
+        # new_user = User.objects.create_user(username='admin', is_superuser=True, is_staff=True)
+        # new_user.set_password('test')
+        # new_user.save()
         user = self.find_element(selector='#id_username')
         user.send_keys("admin")
         pswd = self.find_element(selector='#id_password')
@@ -93,13 +97,13 @@ class AjaxAdminTests(TestCase, LiveServerTestCase):
         self.click_element(selector=".submit-row>[type='submit']")
 
     def assert_selected_option(self, element_id, value):
-        option = self.find_element(selector='#' + element_id + ' option[selected="selected"]')
+        option = self.find_element(selector='#' + element_id + ' option[selected]')
         self.assertEqual(value, option.text)
 
     def assert_select_has_options(self, element_id, expected_ingredients):
         details = self.find_element(selector='#' + element_id)
         options = self.find_element(context=details, tag='option')
-        self.assertItemsEqual(expected_ingredients, [o.text for o in options])
+        self.assertCountEqual(expected_ingredients, [o.text for o in options])
 
     def change_value_for_element(self, element_id, value):
         element = self.find_element(selector='#' + element_id)

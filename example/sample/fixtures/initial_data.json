@@ -11,7 +11,7 @@
             "last_login": "2011-07-11 07:20:56",
             "groups": [],
             "user_permissions": [],
-            "password": "sha1$5b3fb$3b4eec5bd52ed03882cb59c730b9ae4ede14a782",
+            "password": "pbkdf2_sha256$36000$PVAZFMcCSxfE$VZiSkD7b3LXrdILhxuMGnKRd4e/QnU5jSEFFtV28hyg=",
             "email": "a@b.com",
             "date_joined": "2011-07-11 07:20:40"
         }

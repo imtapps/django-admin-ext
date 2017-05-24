@@ -81,7 +81,7 @@ class BaseAjaxModelAdmin(BaseCustomUrlAdmin):
         form doesn't trigger validation. (it would if we used 'data')
         """
         form_class = self.get_form(request, fields=None)
-        return form_class(initial=self.query_dict_to_dict(request.REQUEST), instance=obj)
+        return form_class(initial=self.query_dict_to_dict(request.GET or request.POST), instance=obj)
 
     def query_dict_to_dict(self, query_dict):
         return dict([(k, query_dict.get(k)) for k in query_dict])
@@ -101,8 +101,8 @@ class BaseAjaxModelAdmin(BaseCustomUrlAdmin):
         context)
 
     def get_custom_urls(self, wrapper):
-        info = self.model._meta.app_label, self.model._meta.module_name
+        info = self.model._meta.app_label, self.model._meta.model_name
         return [
-            url(r'^ajax/$',
+            url(r'ajax/$',
                 wrapper(self.ajax_view), name='%s_%s_ajax' % info),
         ]

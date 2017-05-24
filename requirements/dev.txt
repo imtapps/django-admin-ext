@@ -1,0 +1,10 @@
+-r dist.txt
+
+selenium>=2.0
+django-jenkins
+coverage
+pep8
+pyflakes
+django-nose==1.4.3
+nosexcover
+
