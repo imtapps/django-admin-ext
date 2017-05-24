@@ -6,7 +6,7 @@ from distutils.core import Command, setup
 from djadmin_ext import VERSION
 
 REQUIREMENTS = [
-    'django<1.7',
+    'django>=1.11,<1.12'
 ]
 
 TEST_REQUIREMENTS = [
@@ -15,9 +15,10 @@ TEST_REQUIREMENTS = [
     'coverage',
     'pep8',
     'pyflakes',
-    'django-nose',
+    'django-nose==1.4.4-IMT',
     'nosexcover',
 ]
+
 
 def do_setup():
     setup(
