@@ -1,23 +1,25 @@
-
 from django.conf.urls import url
 from django.contrib import admin
 from django.contrib.admin import helpers
 from django.shortcuts import render_to_response
 from functools import update_wrapper
 
-__all__ = (
-    'BaseCustomUrlAdmin', 'BaseAjaxModelAdmin',
-)
+__all__ = ('BaseCustomUrlAdmin', 'BaseAjaxModelAdmin', )
+
 
 class BaseCustomUrlAdmin(admin.ModelAdmin):
     """
     Provides a hook to unobtrusively give your ModelAdmin
     some custom urls.
     """
+
     def get_urls(self):
+
         def wrap(view):
+
             def wrapper(*args, **kwargs):
                 return self.admin_site.admin_view(view)(*args, **kwargs)
+
             return update_wrapper(wrapper, view)
 
         _patterns = self.get_custom_urls(wrap)
@@ -66,7 +68,8 @@ class BaseAjaxModelAdmin(BaseCustomUrlAdmin):
     def get_ajax_context(self, request):
         ajax_form = self.get_ajax_form(request)
         return {
-            'adminform': helpers.AdminForm(
+            'adminform':
+            helpers.AdminForm(
                 ajax_form,
                 self.get_fieldsets(request, ajax_form=ajax_form),
                 self.prepopulated_fields,
@@ -97,12 +100,11 @@ class BaseAjaxModelAdmin(BaseCustomUrlAdmin):
                 "admin/%s/ajax_form.html" % app_label,
                 "admin/ajax_form.html",
                 "djadmin_ext/ajax_form.html",
-            ],
-        context)
+            ], context
+        )
 
     def get_custom_urls(self, wrapper):
         info = self.model._meta.app_label, self.model._meta.model_name
         return [
-            url(r'ajax/$',
-                wrapper(self.ajax_view), name='%s_%s_ajax' % info),
+            url(r'ajax/$', wrapper(self.ajax_view), name='%s_%s_ajax' % info),
         ]

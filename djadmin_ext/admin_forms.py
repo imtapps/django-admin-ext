@@ -1,10 +1,8 @@
-
 from django import forms
 from django.core.exceptions import ImproperlyConfigured
 
-__all__ = (
-    'BaseAjaxModelForm',
-)
+__all__ = ('BaseAjaxModelForm', )
+
 
 class BaseAjaxModelForm(forms.ModelForm):
     """
@@ -70,4 +68,4 @@ class BaseAjaxModelForm(forms.ModelForm):
         return field
 
     class Media(object):
-        js = ('djadmin_ext/admin_ajax.js',)
+        js = ('djadmin_ext/admin_ajax.js', )

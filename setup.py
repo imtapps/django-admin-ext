@@ -7,7 +7,7 @@ setup(
     description="Extensions to Django's admin site to add an ajax view.",
     long_description=open('README.txt', 'r').read(),
     url="https://github.com/imtapps/django-admin-ext",
-    packages=("djadmin_ext",),
+    packages=("djadmin_ext", ),
     include_package_data=True,
     install_requires=open('requirements/dist.txt', 'r').read().split('\n'),
     zip_safe=False,

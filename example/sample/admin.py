@@ -1,10 +1,10 @@
-
 from django import forms
 from django.contrib import admin
 
 from djadmin_ext.helpers import BaseAjaxModelAdmin
 from djadmin_ext.admin_forms import BaseAjaxModelForm
 from sample import models
+
 
 class MealAdminForm(BaseAjaxModelForm):
     ajax_change_fields = ["food_type", "main_ingredient"]
@@ -32,8 +32,9 @@ class MealAdminForm(BaseAjaxModelForm):
 
             if selected_ingredient and details:
                 selected_ingredient_details = self.get_selected_value('ingredient_details')
-                fields['ingredient_details'] = self.create_field_and_assign_initial_value(details,
-                                                                                          selected_ingredient_details)
+                fields['ingredient_details'] = self.create_field_and_assign_initial_value(
+                    details, selected_ingredient_details
+                )
 
         return fields
 
@@ -44,8 +45,10 @@ class MealAdminForm(BaseAjaxModelForm):
         fields = ['food_type']
         model = models.Meal
 
+
 class MealAdmin(BaseAjaxModelAdmin):
     form = MealAdminForm
+
 
 admin.site.register(models.FoodType)
 admin.site.register(models.Ingredient)

@@ -50,7 +50,8 @@ class AjaxAdminTests(TestCase, LiveServerTestCase):
 
         cls.driver = webdriver.Remote(
             desired_capabilities=caps,
-            command_executor="http://imtappswebadmin:841f95a0-c21d-4cb4-a7f4-288ed88a4b18@ondemand.saucelabs.com:80/wd/hub"
+            command_executor=
+            "http://imtappswebadmin:841f95a0-c21d-4cb4-a7f4-288ed88a4b18@ondemand.saucelabs.com:80/wd/hub"
         )
         cls.driver.implicitly_wait(30)
 
@@ -122,7 +123,9 @@ class AjaxAdminTests(TestCase, LiveServerTestCase):
         self.driver.get("%s/admin/sample/meal/add/" % self.live_server_url)
         self.change_value_for_element('id_food_type', 'pizza')
 
-        self.assert_select_has_options('id_main_ingredient', [u'---------', u'pepperoni', u'mushrooms', u'beef', u'anchovies'])
+        self.assert_select_has_options(
+            'id_main_ingredient', [u'---------', u'pepperoni', u'mushrooms', u'beef', u'anchovies']
+        )
 
     def test_main_ingredient_element_shows_when_burger_food_type_is_selected(self):
         self.driver.get("%s/admin/sample/meal/add/" % self.live_server_url)
@@ -163,7 +166,9 @@ class AjaxAdminTests(TestCase, LiveServerTestCase):
 
         self.change_value_for_element('id_main_ingredient', 'pepperoni')
 
-        self.assert_select_has_options('id_ingredient_details', [u'---------', u'Grass Fed Goodness', u'Cardboard Not So Goodness'])
+        self.assert_select_has_options(
+            'id_ingredient_details', [u'---------', u'Grass Fed Goodness', u'Cardboard Not So Goodness']
+        )
 
     def test_main_ingredient_does_not_change_when_food_type_changes_if_valid_option(self):
         self.driver.get("%s/admin/sample/meal/add/" % self.live_server_url)
