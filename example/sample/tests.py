@@ -6,7 +6,7 @@ from selenium import webdriver
 from selenium.webdriver.support.wait import WebDriverWait
 
 
-def retry(func):
+def retry(func):  # noqa C901
 
     @wraps(func)
     def retry_test(self, countdown=30, *args, **kwargs):
