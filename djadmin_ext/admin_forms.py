@@ -39,12 +39,7 @@ class BaseAjaxModelForm(forms.ModelForm):
         if not self.ajax_change_fields:
             raise ImproperlyConfigured("Your Admin Ajax form needs an ajax change field")
 
-        fields = []
-        for field in self.ajax_change_fields:
-            if field in self.fields:
-                fields.append(str(self[field].auto_id))
-
-        return fields
+        return [str(self[field].auto_id) for field in self.ajax_change_fields if field in self.fields]
 
     def save(self, *args, **kwargs):
         """

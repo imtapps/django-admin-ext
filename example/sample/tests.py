@@ -50,8 +50,9 @@ class AjaxAdminTests(TestCase, LiveServerTestCase):
 
         cls.driver = webdriver.Remote(
             desired_capabilities=caps,
-            command_executor=
-            "http://imtappswebadmin:841f95a0-c21d-4cb4-a7f4-288ed88a4b18@ondemand.saucelabs.com:80/wd/hub"
+            command_executor=(
+                "http://imtappswebadmin:841f95a0-c21d-4cb4-a7f4-288ed88a4b18@ondemand.saucelabs.com:80/wd/hub"
+            )
         )
         cls.driver.implicitly_wait(30)
 
@@ -67,7 +68,7 @@ class AjaxAdminTests(TestCase, LiveServerTestCase):
     def _get_element(self, context, method, argument):
         return getattr(context, method)(argument)
 
-    def find_element(self, context=None, name=None, selector=None, tag=None):
+    def find_element(self, context=None, name=None, selector=None, tag=None):  # noqa C901
         argument = name or selector or tag
         context = context or self.driver
         if name:
@@ -217,7 +218,7 @@ class AjaxAdminTests(TestCase, LiveServerTestCase):
         # make sure our new main_ingredient was saved
         self.assert_selected_option('id_main_ingredient', 'lettuce')
 
-        #delete our meal when we're done
+        # delete our meal when we're done
         self.click_element(selector='.deletelink')
         self.click_element(selector='[type="submit"]')
 
