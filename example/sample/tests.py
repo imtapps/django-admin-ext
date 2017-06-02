@@ -1,6 +1,7 @@
 from functools import wraps
 from django.contrib.auth.models import User
-from django.test.testcases import TestCase, LiveServerTestCase
+from django.test.testcases import TestCase
+from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from selenium.common.exceptions import TimeoutException, NoSuchElementException, StaleElementReferenceException
 from selenium import webdriver
 from selenium.webdriver.support.wait import WebDriverWait
@@ -36,7 +37,7 @@ class Retry(type):
         return super(Retry, cls).__new__(cls, name, bases, attrs)
 
 
-class AjaxAdminTests(TestCase, LiveServerTestCase):
+class AjaxAdminTests(TestCase, StaticLiveServerTestCase):
     __metaclass__ = Retry
     fixtures = ['initial_data.json']
 
@@ -80,7 +81,7 @@ class AjaxAdminTests(TestCase, LiveServerTestCase):
         else:
             raise Exception("No Selector")
 
-        WebDriverWait(context, 60, 1).until(lambda d: self._get_element(d, method, argument))
+        WebDriverWait(context, 5, 1).until(lambda d: self._get_element(d, method, argument))
         return self._get_element(context, method, argument)
 
     def click_element(self, **kwargs):
