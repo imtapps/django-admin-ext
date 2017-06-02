@@ -80,7 +80,7 @@ class AjaxAdminTests(TestCase, LiveServerTestCase):
         else:
             raise Exception("No Selector")
 
-        WebDriverWait(context, 5, 1).until(lambda d: self._get_element(d, method, argument))
+        WebDriverWait(context, 60, 1).until(lambda d: self._get_element(d, method, argument))
         return self._get_element(context, method, argument)
 
     def click_element(self, **kwargs):
