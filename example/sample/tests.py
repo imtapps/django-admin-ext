@@ -112,7 +112,10 @@ class AjaxAdminTests(TestCase, StaticLiveServerTestCase):
         element = self.find_element(selector='#' + element_id)
         element.send_keys(value)
         # click off of the element to trigger the change event
-        self.click_element(selector='label[for="' + element_id + '"]')
+        try:
+            self.click_element(selector='label[for="' + element_id + '"]')
+        except Exception:
+            pass
 
     def test_main_ingredient_element_not_present_initially(self):
         self.driver.get("%s/admin/sample/meal/add/" % self.live_server_url)
