@@ -4,7 +4,10 @@ from django.contrib.admin import helpers
 from django.shortcuts import render_to_response
 from functools import update_wrapper
 
-__all__ = ('BaseCustomUrlAdmin', 'BaseAjaxModelAdmin', )
+__all__ = (
+    'BaseCustomUrlAdmin',
+    'BaseAjaxModelAdmin',
+)
 
 
 class BaseCustomUrlAdmin(admin.ModelAdmin):
