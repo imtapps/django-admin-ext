@@ -1,12 +1,13 @@
 from functools import wraps
 from django.contrib.auth.models import User
-from django.test.testcases import TestCase, LiveServerTestCase
+from django.test.testcases import TestCase
+from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from selenium.common.exceptions import TimeoutException, NoSuchElementException, StaleElementReferenceException
 from selenium import webdriver
 from selenium.webdriver.support.wait import WebDriverWait
 
 
-def retry(func):
+def retry(func):  # noqa C901
 
     @wraps(func)
     def retry_test(self, countdown=30, *args, **kwargs):
@@ -36,8 +37,9 @@ class Retry(type):
         return super(Retry, cls).__new__(cls, name, bases, attrs)
 
 
-class AjaxAdminTests(TestCase, LiveServerTestCase):
+class AjaxAdminTests(TestCase, StaticLiveServerTestCase):
     __metaclass__ = Retry
+    fixtures = ['initial_data.json']
 
     @classmethod
     def setUpClass(cls):
@@ -49,13 +51,15 @@ class AjaxAdminTests(TestCase, LiveServerTestCase):
 
         cls.driver = webdriver.Remote(
             desired_capabilities=caps,
-            command_executor="http://imtappswebadmin:841f95a0-c21d-4cb4-a7f4-288ed88a4b18@ondemand.saucelabs.com:80/wd/hub"
+            command_executor=(
+                "http://imtappswebadmin:841f95a0-c21d-4cb4-a7f4-288ed88a4b18@ondemand.saucelabs.com:80/wd/hub"
+            )
         )
         cls.driver.implicitly_wait(30)
 
     @classmethod
     def tearDownClass(cls):
-        print "Link to your job: https://saucelabs.com/jobs/%s" % cls.driver.session_id
+        print("Link to your job: https://saucelabs.com/jobs/%s" % cls.driver.session_id)
         cls.driver.quit()
 
     def setUp(self):
@@ -65,7 +69,7 @@ class AjaxAdminTests(TestCase, LiveServerTestCase):
     def _get_element(self, context, method, argument):
         return getattr(context, method)(argument)
 
-    def find_element(self, context=None, name=None, selector=None, tag=None):
+    def find_element(self, context=None, name=None, selector=None, tag=None):  # noqa C901
         argument = name or selector or tag
         context = context or self.driver
         if name:
@@ -77,7 +81,7 @@ class AjaxAdminTests(TestCase, LiveServerTestCase):
         else:
             raise Exception("No Selector")
 
-        WebDriverWait(context, 5, 1).until(lambda d: self._get_element(d, method, argument))
+        WebDriverWait(context, 60, 1).until(lambda d: self._get_element(d, method, argument))
         return self._get_element(context, method, argument)
 
     def click_element(self, **kwargs):
@@ -86,6 +90,9 @@ class AjaxAdminTests(TestCase, LiveServerTestCase):
 
     def login(self):
         self.driver.get("%s/admin/" % self.live_server_url)
+        # new_user = User.objects.create_user(username='admin', is_superuser=True, is_staff=True)
+        # new_user.set_password('test')
+        # new_user.save()
         user = self.find_element(selector='#id_username')
         user.send_keys("admin")
         pswd = self.find_element(selector='#id_password')
@@ -93,19 +100,22 @@ class AjaxAdminTests(TestCase, LiveServerTestCase):
         self.click_element(selector=".submit-row>[type='submit']")
 
     def assert_selected_option(self, element_id, value):
-        option = self.find_element(selector='#' + element_id + ' option[selected="selected"]')
+        option = self.find_element(selector='#' + element_id + ' option[selected]')
         self.assertEqual(value, option.text)
 
     def assert_select_has_options(self, element_id, expected_ingredients):
         details = self.find_element(selector='#' + element_id)
         options = self.find_element(context=details, tag='option')
-        self.assertItemsEqual(expected_ingredients, [o.text for o in options])
+        self.assertCountEqual(expected_ingredients, [o.text for o in options])
 
     def change_value_for_element(self, element_id, value):
         element = self.find_element(selector='#' + element_id)
         element.send_keys(value)
         # click off of the element to trigger the change event
-        self.click_element(selector='label[for="' + element_id + '"]')
+        try:
+            self.click_element(selector='label[for="' + element_id + '"]')
+        except Exception:
+            pass
 
     def test_main_ingredient_element_not_present_initially(self):
         self.driver.get("%s/admin/sample/meal/add/" % self.live_server_url)
@@ -118,7 +128,9 @@ class AjaxAdminTests(TestCase, LiveServerTestCase):
         self.driver.get("%s/admin/sample/meal/add/" % self.live_server_url)
         self.change_value_for_element('id_food_type', 'pizza')
 
-        self.assert_select_has_options('id_main_ingredient', [u'---------', u'pepperoni', u'mushrooms', u'beef', u'anchovies'])
+        self.assert_select_has_options(
+            'id_main_ingredient', [u'---------', u'pepperoni', u'mushrooms', u'beef', u'anchovies']
+        )
 
     def test_main_ingredient_element_shows_when_burger_food_type_is_selected(self):
         self.driver.get("%s/admin/sample/meal/add/" % self.live_server_url)
@@ -159,7 +171,9 @@ class AjaxAdminTests(TestCase, LiveServerTestCase):
 
         self.change_value_for_element('id_main_ingredient', 'pepperoni')
 
-        self.assert_select_has_options('id_ingredient_details', [u'---------', u'Grass Fed Goodness', u'Cardboard Not So Goodness'])
+        self.assert_select_has_options(
+            'id_ingredient_details', [u'---------', u'Grass Fed Goodness', u'Cardboard Not So Goodness']
+        )
 
     def test_main_ingredient_does_not_change_when_food_type_changes_if_valid_option(self):
         self.driver.get("%s/admin/sample/meal/add/" % self.live_server_url)
@@ -208,7 +222,7 @@ class AjaxAdminTests(TestCase, LiveServerTestCase):
         # make sure our new main_ingredient was saved
         self.assert_selected_option('id_main_ingredient', 'lettuce')
 
-        #delete our meal when we're done
+        # delete our meal when we're done
         self.click_element(selector='.deletelink')
         self.click_element(selector='[type="submit"]')
 

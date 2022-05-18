@@ -1,10 +1,8 @@
-
 from django import forms
 from django.core.exceptions import ImproperlyConfigured
 
-__all__ = (
-    'BaseAjaxModelForm',
-)
+__all__ = ('BaseAjaxModelForm', )
+
 
 class BaseAjaxModelForm(forms.ModelForm):
     """
@@ -41,12 +39,7 @@ class BaseAjaxModelForm(forms.ModelForm):
         if not self.ajax_change_fields:
             raise ImproperlyConfigured("Your Admin Ajax form needs an ajax change field")
 
-        fields = []
-        for field in self.ajax_change_fields:
-            if field in self.fields:
-                fields.append(str(self[field].auto_id))
-
-        return fields
+        return [str(self[field].auto_id) for field in self.ajax_change_fields if field in self.fields]
 
     def save(self, *args, **kwargs):
         """
@@ -70,4 +63,4 @@ class BaseAjaxModelForm(forms.ModelForm):
         return field
 
     class Media(object):
-        js = ('djadmin_ext/admin_ajax.js',)
+        js = ('djadmin_ext/admin_ajax.js', )
